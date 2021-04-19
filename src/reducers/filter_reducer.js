@@ -1,3 +1,4 @@
+import { act } from 'react-dom/test-utils'
 import {
   LOAD_PRODUCTS,
   SET_LISTVIEW,
@@ -11,10 +12,13 @@ import {
 
 const filter_reducer = (state, action) => {
   if (action.type === LOAD_PRODUCTS) {
+    let maxPrice = action.payload.map((p) => p.price)
+    maxPrice = Math.max(...maxPrice)
     return {
       ...state,
       all_products: [...action.payload],
       filtered_products: [...action.payload],
+      filters: { ...state.filters, max_price: maxPrice, price: maxPrice },
     }
   }
   if (action.type === SET_GRIDVIEW) {
@@ -58,6 +62,10 @@ const filter_reducer = (state, action) => {
       })
     }
     return { ...state, filtered_products: tempProducts }
+  }
+  if (action.type === UPDATE_FILTERS) {
+    const { name, value } = action.payload
+    return { ...state, filters: { ...state.filters, [name]: value } }
   }
   throw new Error(`No Matching "${action.type}" - action type`)
 }
